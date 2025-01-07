@@ -7,6 +7,6 @@
     "."
   ],
   "search_path": [
-    "../../../stubs/"
+    "stubs/"
   ]
 }
