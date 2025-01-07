@@ -1,5 +1,6 @@
 # flask.Request sources
 flask.Request.form: TaintSource[UserControlled] = ...
+werkzeug.wrappers.Request.form: TaintSource[UserControlled] = ...
 
 
 # Filesystem Sinks
