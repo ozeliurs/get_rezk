@@ -1,0 +1,879 @@
+# Work-in -progress spec for Pyre's patches to typeshed stubs.
+#
+# The current patches still live as diff patches in scripts/typeshed-patches,
+# this file is our progress on using a new name-based specification for
+# patches that should be much easier to maintain.
+
+# Add imports + typevars to the top
+[["stdlib/builtins.pyi"]]
+action = "add"
+position = "top"
+content = '''
+from typing import _PyreReadOnly_, TypeVar
+
+N1 = TypeVar("N1", bound=int)
+N2 = TypeVar("N2", bound=int)
+'''
+
+# Mark __eq__, __str__, and __repr__ as *always* read-only on object
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "object"
+name = "__eq__"
+content = '''
+def __eq__(self: _PyreReadOnly_[Self], o: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "object"
+name = "__str__"
+content = '''
+def __str__(self: _PyreReadOnly_[Self]) -> str: ...  # noqa: Y029
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "object"
+name = "__repr__"
+content = '''
+def __repr__(self: _PyreReadOnly_[Self]) -> str: ...  # noqa: Y029
+'''
+
+
+# Mark __eq__ as read-only on int and float
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "int"
+name = "__eq__"
+content = '''
+def __eq__(self: _PyreReadOnly_[Self], x: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "float"
+name = "__eq__"
+content = '''
+def __eq__(self: _PyreReadOnly_[Self], x: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+# Mark or override a variety of string methods as _PyreReadOnly_
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "str"
+name = "isdigit"
+content = '''
+def isdigit(self: _PyreReadOnly_[Self]) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "str"
+name = "lower"
+content = '''
+@overload
+def lower(self: LiteralString) -> LiteralString: ...
+@overload
+def lower(self: _PyreReadOnly_[Self]) -> str: ...  # type: ignore[misc]
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "str"
+name = "__eq__"
+content = '''
+def __eq__(self: _PyreReadOnly_[Self], x: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "str"
+name = "__getitem__"
+content = '''
+def __getitem__(self: _PyreReadOnly_[Self], i: SupportsIndex | slice, /) -> str: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "str"
+name = "__contains__"
+content = '''
+def __contains__(self, o: str, /) -> bool: ...  # type: ignore[override]
+'''
+
+# Add read-only overloads for list __iter__ + __getitem__, and make __contains__ read-only
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "list"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[_T]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[Self]) -> Iterator[_PyreReadOnly_[_T]]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "list"
+name = "__getitem__"
+content = '''
+@overload
+def __getitem__(self, i: SupportsIndex, /) -> _T: ...
+@overload
+def __getitem__(self, s: slice, /) -> list[_T]: ...
+@overload
+def __getitem__(self: _PyreReadOnly_[Self], i: SupportsIndex, /) -> _PyreReadOnly_[_T]: ...
+@overload
+def __getitem__(self: _PyreReadOnly_[Self], s: slice, /) -> list[_PyreReadOnly_[_T]]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "list"
+name = "__contains__"
+content = '''
+def __contains__(self: _PyreReadOnly_[Self], o: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+# Add read-only overloads for a handful of dict
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "keys"
+content = '''
+@overload
+def keys(self) -> dict_keys[_KT, _VT]: ...
+@overload
+def keys(self: _PyreReadOnly_[Self]) -> _PyreReadOnly_[dict_keys[_KT, _VT]]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "values"
+content = '''
+@overload
+def values(self) -> dict_values[_KT, _VT]: ...
+@overload
+def values(self: _PyreReadOnly_[Self]) -> _PyreReadOnly_[dict_values[_KT, _VT]]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "items"
+content = '''
+@overload
+def items(self) -> dict_items[_KT, _VT]: ...
+@overload
+def items(self: _PyreReadOnly_[Self]) -> _PyreReadOnly_[dict_items[_KT, _VT]]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "get"
+content = '''
+@overload
+def get(self, key: _KT, /) -> _VT | None: ...
+@overload
+def get(self, key: _KT, default: _VT | _T, /) -> _VT | _T: ...
+@overload
+def get(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], /) -> _PyreReadOnly_[_VT | None]: ...
+@overload
+def get(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], default: _PyreReadOnly_[_VT | _T], /) -> _PyreReadOnly_[_VT | _T]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "__getitem__"
+content = '''
+@overload
+def __getitem__(self, key: _KT, /) -> _VT: ...
+@overload
+def __getitem__(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], /) -> _PyreReadOnly_[_VT]: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "dict"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[_KT]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[dict[_KT, _VT]]) -> Iterator[_PyreReadOnly_[_KT]]: ...
+'''
+
+# Mark a couple of set methods as read-only
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "set"
+name = "__contains__"
+content = '''
+def __contains__(self, o: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+parent = "set"
+name = "__sub__"
+content = '''
+@overload
+def __sub__(self, s: _PyreReadOnly_[AbstractSet[_T | None]], /) -> set[_T]: ...
+@overload
+def __sub__(self: _PyreReadOnly_[Self], s: _PyreReadOnly_[AbstractSet[_T | None]], /) -> _PyreReadOnly_[set[_T]]: ...
+'''
+
+# Mark a few of the builtin functions as read-only
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+name = "hasattr"
+content = '''
+def hasattr(obj: _PyreReadOnly_[object], name: str, /) -> bool: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+name = "len"
+content = '''
+def len(obj: _PyreReadOnly_[Sized], /) -> int: ...
+'''
+
+[["stdlib/builtins.pyi"]]
+action = "replace"
+name = "sorted"
+content = '''
+@overload
+def sorted(
+    iterable: _PyreReadOnly_[Iterable[SupportsRichComparisonT]], /, *, key: None = None, reverse: bool = False
+) -> list[SupportsRichComparisonT]: ...
+@overload
+def sorted(iterable: _PyreReadOnly_[Iterable[_T]], /, *, key: Callable[[_T], SupportsRichComparison], reverse: bool = False) -> list[_T]: ...
+'''
+
+# Explicitly define BaseException's __str__ and __repr__ so that Pysa can mark them as sources.
+[["stdlib/builtins.pyi"]]
+action = "add"
+parent = "BaseException"
+position = "bottom"
+content = '''
+# Define `__str__` and `__repr__` explicitly so pysa can mark them as sources
+def __str__(self) -> str: ...  # noqa: Y029
+def __repr__(self) -> str: ...  # noqa: Y029
+'''
+
+
+# Add additional imports at the top of typing.pyi
+[["stdlib/typing.pyi"]]
+action = "add"
+position = "top"
+content = '''
+from typing_extensions import Self
+'''
+
+# Avoid using a type alias for AsyncContextManager
+[["stdlib/typing.pyi"]]
+action = "replace"
+name = "AsyncContextManager"
+content = '''
+
+@runtime_checkable
+class AsyncContextManager(Protocol[_T_co]):
+    async def __aenter__(self) -> _T_co: ...
+    @abstractmethod
+    async def __aexit__(
+        self, exc_type: Type[BaseException] | None, exc_value: BaseException | None, traceback: TracebackType | None, /
+    ) -> bool | None: ...
+'''
+
+# Make Container protocol read-only only (no overloads)
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Container"
+name = "__contains__"
+content = '''
+@abstractmethod
+def __contains__(self: _PyreReadOnly_[Self], x: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+
+# Add read-only overloads for Collection.__getitem__
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Sequence"
+name = "__getitem__"
+content = '''
+@overload
+@abstractmethod
+def __getitem__(self, index: int) -> _T_co: ...
+@overload
+@abstractmethod
+def __getitem__(self, index: slice) -> Sequence[_T_co]: ...
+@overload
+@abstractmethod
+def __getitem__(self: _PyreReadOnly_[Self], i: int, /) -> _PyreReadOnly_[_T_co]: ...
+@overload
+@abstractmethod
+def __getitem__(self: _PyreReadOnly_[Self], s: slice, /) -> _PyreReadOnly_[Self]: ...
+'''
+
+# Add read-only overloads for Collection.__iter__
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Sequence"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[_T_co]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[Self]) -> Iterator[_PyreReadOnly_[_T_co]]: ...
+'''
+
+# Add read-only overloads for ItemsView.__iter__
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "ItemsView"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[tuple[_KT_co, _VT_co]]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[Self]) -> Iterator[tuple[_PyreReadOnly_[_KT_co], _PyreReadOnly_[_VT_co]]]: ...
+'''
+
+# Add read-only overloads for KeysView.__iter__
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "KeysView"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[_KT_co]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[Self]) -> Iterator[_PyreReadOnly_[_KT_co]]: ...
+'''
+
+# Add read-only overloads for ValuesView.__iter__
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "ValuesView"
+name = "__iter__"
+content = '''
+@overload
+def __iter__(self) -> Iterator[_VT_co]: ...
+@overload
+def __iter__(self: _PyreReadOnly_[Self]) -> Iterator[_PyreReadOnly_[_VT_co]]: ...
+'''
+
+# Add read-only overloads to several Mapping methods, or mark as read-only
+
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Mapping"
+name = "__getitem__"
+content = '''
+@overload
+@abstractmethod
+def __getitem__(self, key: _KT, /) -> _VT_co: ...
+@overload
+@abstractmethod
+def __getitem__(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], /) -> _PyreReadOnly_[_VT_co]: ...
+'''
+
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Mapping"
+name = "get"
+content = '''
+@overload
+def get(self, key: _KT, /) -> _VT_co | None: ...
+@overload
+def get(self, key: _KT, /, default: _VT_co | _T) -> _VT_co | _T: ...
+@overload
+def get(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], /) -> _PyreReadOnly_[_VT_co | None]: ...
+@overload
+def get(self: _PyreReadOnly_[Self], key: _PyreReadOnly_[_KT], /, default: _PyreReadOnly_[_VT_co | _T]) -> _PyreReadOnly_[_VT_co | _T]: ...
+'''
+
+[["stdlib/typing.pyi"]]
+action = "replace"
+parent = "Mapping"
+name = "__contains__"
+content = '''
+def __contains__(self: _PyreReadOnly_[Self], o: _PyreReadOnly_[object], /) -> bool: ...
+'''
+
+
+[["stdlib/typing.pyi"]]
+action = "add"
+position = "bottom"
+content = '''
+class _PyreReadOnly_(Generic[_T]): ...
+'''
+
+
+# Strip the __call__ method from EnumMeta.  TODO(T77220912): debug the root
+# problem that forced ust to add this patch and remove it.
+[["stdlib/enum.pyi"]]
+action = "delete"
+parent = "EnumMeta"
+name = "__call__"
+
+
+# Strip the @abstractmethod dekeyscorator on `Number.__hash__`
+[["stdlib/numbers.pyi"]]
+action = "replace"
+parent = "Number"
+name = "__hash__"
+content = '''
+def __hash__(self) -> int: ...
+'''
+
+
+# The __dataclass_fields__ here causes confusion for Pyre today,
+# possibly due to our existing hardcoded support for dataclasses.
+[["stdlib/_typeshed/__init__.pyi"]]
+action = "replace"
+parent = "DataclassInstance"
+name = "__dataclass_fields__"
+content = '''
+...
+'''
+
+
+# For some reason we haven't figured out, the indirection in
+# typeshed for os.path confuses Pyre.
+
+[["stdlib/os/__init__.pyi"]]
+action = "delete"
+name = "_path"
+
+[["stdlib/os/__init__.pyi"]]
+action = "replace"
+name = "path"
+content = '''
+from . import path
+'''
+
+[["stdlib/urllib/parse.pyi"]]
+action = "add"
+position = "top"
+content = '''
+from typing import _PyreReadOnly_
+'''
+
+[["stdlib/urllib/parse.pyi"]]
+action = "replace"
+name = "unquote_plus"
+content='''
+def unquote_plus(string: _PyreReadOnly_[str], encoding: str = "utf-8", errors: str = "replace") -> str: ...
+'''
+
+
+# Allowing a non-Any-typed asyncio.gather for "fat" calls (more than 6 elements) causes
+# major problems in parts of the code that use them for performance.
+#
+# One problem is that it can generate a lot of type errors, but more importantly there are
+# some particularly large examples where it causes Pyre's constraint solver to enter
+# intractable calculations that eventually crash the type checker.
+#
+# The only thing we're intending to patch here are the fully-variadic overloads that return
+# list, but we have to replace the entire overload block because the patcher only patches by
+# name.
+#
+# TODO(T170300227) understand the performance problems related to analyzing
+# asyncio.gather calls and determine whether there's a path to removing
+# this patch.
+[["stdlib/asyncio/tasks.pyi"]]
+action = "replace"
+name = "gather"
+content = '''
+if sys.version_info >= (3, 10):
+    @overload
+    def gather(coro_or_future1: _FutureLike[_T1], /, *, return_exceptions: Literal[False] = False) -> Future[tuple[_T1]]: ...  # type: ignore[misc]
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1], coro_or_future2: _FutureLike[_T2], /, *, return_exceptions: Literal[False] = False
+    ) -> Future[tuple[_T1, _T2]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        /,
+        *,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        /,
+        *,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3, _T4]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        coro_or_future5: _FutureLike[_T5],
+        /,
+        *,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3, _T4, _T5]]: ...
+    @overload
+    def gather(coro_or_future1: _FutureLike[_T1], /, *, return_exceptions: bool) -> Future[tuple[_T1 | BaseException]]: ...  # type: ignore[misc]
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1], coro_or_future2: _FutureLike[_T2], /, *, return_exceptions: bool
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        /,
+        *,
+        return_exceptions: bool,
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        /,
+        *,
+        return_exceptions: bool,
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException, _T4 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        coro_or_future5: _FutureLike[_T5],
+        /,
+        *,
+        return_exceptions: bool,
+    ) -> Future[
+        tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException, _T4 | BaseException, _T5 | BaseException]
+    ]: ...
+    @overload
+    def gather(*coros_or_futures: _FutureLike[Any], return_exceptions: bool = False) -> Future[list[Any]]: ...
+else:
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1], /, *, loop: AbstractEventLoop | None = None, return_exceptions: Literal[False] = False
+    ) -> Future[tuple[_T1]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3, _T4]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        coro_or_future5: _FutureLike[_T5],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: Literal[False] = False,
+    ) -> Future[tuple[_T1, _T2, _T3, _T4, _T5]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1], /, *, loop: AbstractEventLoop | None = None, return_exceptions: bool
+    ) -> Future[tuple[_T1 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: bool,
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: bool,
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: bool,
+    ) -> Future[tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException, _T4 | BaseException]]: ...
+    @overload
+    def gather(  # type: ignore[misc]
+        coro_or_future1: _FutureLike[_T1],
+        coro_or_future2: _FutureLike[_T2],
+        coro_or_future3: _FutureLike[_T3],
+        coro_or_future4: _FutureLike[_T4],
+        coro_or_future5: _FutureLike[_T5],
+        /,
+        *,
+        loop: AbstractEventLoop | None = None,
+        return_exceptions: bool,
+    ) -> Future[
+        tuple[_T1 | BaseException, _T2 | BaseException, _T3 | BaseException, _T4 | BaseException, _T5 | BaseException]
+    ]: ...
+    @overload
+    def gather(
+        *coros_or_futures: _FutureLike[Any], loop: AbstractEventLoop | None = None, return_exceptions: bool = False
+    ) -> Future[list[Any]]: ...
+'''
+
+# random.pyi contains a bunch of unannotated top-level definitions aliased to attributes in the `random.Random` class.
+# Pyre does not really like that.
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "seed"
+content = '''
+if sys.version_info >= (3, 9):
+    def seed(a: int | float | str | bytes | bytearray | None = None, version: int = 2) -> None: ...
+else:
+    def seed(a: Any = None, version: int = 2) -> None: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "random"
+content = '''
+def random() -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "uniform"
+content = '''
+def uniform(a: float, b: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "triangular"
+content = '''
+def triangular(low: float = 0.0, high: float = 1.0, mode: float | None = None) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "randint"
+content = '''
+def randint(a: int, b: int) -> int: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "choice"
+content = '''
+def choice(seq: SupportsLenAndGetItem[_T]) -> _T: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "randrange"
+content = '''
+def randrange(start: int, stop: int | None = None, step: int = 1) -> int: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "sample"
+content = '''
+if sys.version_info >= (3, 11):
+    def sample(population: Sequence[_T], k: int, *, counts: Iterable[int] | None = None) -> list[_T]: ...
+elif sys.version_info >= (3, 9):
+    def sample(
+        population: Sequence[_T] | AbstractSet[_T], k: int, *, counts: Iterable[int] | None = None
+    ) -> list[_T]: ...
+else:
+    def sample(population: Sequence[_T] | AbstractSet[_T], k: int) -> list[_T]: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "shuffle"
+content = '''
+if sys.version_info >= (3, 11):
+    def shuffle(x: MutableSequence[Any]) -> None: ...
+else:
+    def shuffle(x: MutableSequence[Any], random: Callable[[], float] | None = None) -> None: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "choices"
+content = '''
+def choices(
+    population: SupportsLenAndGetItem[_T],
+    weights: Sequence[float | Fraction] | None = None,
+    *,
+    cum_weights: Sequence[float | Fraction] | None = None,
+    k: int = 1,
+) -> list[_T]: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "normalvariate"
+content = '''
+if sys.version_info >= (3, 11):
+    def normalvariate(mu: float = 0.0, sigma: float = 1.0) -> float: ...
+else:
+    def normalvariate(mu: float, sigma: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "lognormvariate"
+content = '''
+def lognormvariate(mu: float, sigma: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "expovariate"
+content = '''
+if sys.version_info >= (3, 12):
+    def expovariate(lambd: float = 1.0) -> float: ...
+else:
+    def expovariate(lambd: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "vonmisesvariate"
+content = '''
+def vonmisesvariate(mu: float, kappa: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "gammavariate"
+content = '''
+def gammavariate(alpha: float, beta: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "gauss"
+content = '''
+if sys.version_info >= (3, 11):
+    def gauss(mu: float = 0.0, sigma: float = 1.0) -> float: ...
+else:
+    def gauss(mu: float, sigma: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "binomialvariate"
+content = '''
+if sys.version_info >= (3, 12):
+    def binomialvariate(n: int = 1, p: float = 0.5) -> int: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "betavariate"
+content = '''
+def betavariate(alpha: float, beta: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "paretovariate"
+content = '''
+def paretovariate(alpha: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "weibullvariate"
+content = '''
+def weibullvariate(alpha: float, beta: float) -> float: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "getstate"
+content = '''
+def getstate() -> _random._State: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "setstate"
+content = '''
+def setstate(state: _random._State, /) -> None: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "getrandbits"
+content = '''
+def getrandbits(k: int, /) -> int: ...
+'''
+
+[["stdlib/random.pyi"]]
+action = "replace"
+name = "randbytes"
+content = '''
+if sys.version_info >= (3, 9):
+    def randbytes(n: int) -> bytes: ...
+'''
