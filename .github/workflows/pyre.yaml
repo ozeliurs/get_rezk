@@ -25,6 +25,6 @@ jobs:
           pip install pyre-check
 
       - name: Run Pyre analyze
-        working-directory: ${{ github.workspace }}/get_rezk/pysa
+        working-directory: ${{ github.workspace }}/pysa
         run: |
           pyre analyze
