@@ -27,4 +27,5 @@ jobs:
       - name: Run Pyre analyze
         working-directory: ${{ github.workspace }}/pysa
         run: |
+          ls -la
           pyre analyze
