@@ -1,26 +1,25 @@
-# file_operations.py
-
 import os
+from typing import Any
 
 
 class SecurityException(Exception):
     pass
 
 
-def unsafe_file_access(user_input):
-    # BAD: Unsafe direct use of user input in file path
-    file_path = f"/home/user/files/{user_input}"
+# Add type annotations for better analysis
+def unsafe_file_access(user_input: str) -> str:
+    file_path = (
+        f"/home/user/files/{user_input}"  # TaintFlow[RequestSource -> FileSystem]
+    )
     with open(file_path, "r") as file:
         return file.read()
 
 
-def safe_file_access(user_input):
-    # GOOD: Sanitize and validate the file path
+def safe_file_access(user_input: str) -> str:
     base_dir = "/home/user/files"
     sanitized_input = os.path.basename(user_input)
     file_path = os.path.join(base_dir, sanitized_input)
 
-    # Additional validation
     if not os.path.abspath(file_path).startswith(base_dir):
         raise SecurityException("Path traversal attempt detected")
 
@@ -28,7 +27,6 @@ def safe_file_access(user_input):
         return file.read()
 
 
-# Example web route handler
-def handle_file_request(request):
-    filename = request.GET.get("filename", "")
-    return unsafe_file_access(filename)  # Vulnerable to path traversal
+def handle_file_request(request: Any) -> str:
+    filename = request.GET.get("filename", "")  # Marked as TaintSource[RequestSource]
+    return unsafe_file_access(filename)  # Shows flow from source to sink
