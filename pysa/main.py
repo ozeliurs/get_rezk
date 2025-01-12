@@ -1,58 +1,34 @@
+# file_operations.py
+
 import os
 
-from flask import Flask, request
 
-app = Flask(__name__)
-
-# Define the base directory
-BASE_DIRECTORY = os.path.abspath("safe_directory")
+class SecurityException(Exception):
+    pass
 
 
-@app.route("/")
-def home():
-    return """
-        <h1>File Reader</h1>
-        <form action="/read" method="post">
-            <label for="filename">Enter the file name to read:</label>
-            <input type="text" id="filename" name="filename">
-            <input type="submit" value="Read File">
-        </form>
-    """
+def unsafe_file_access(user_input):
+    # BAD: Unsafe direct use of user input in file path
+    file_path = f"/home/user/files/{user_input}"
+    with open(file_path, "r") as file:
+        return file.read()
 
 
-@app.route("/read", methods=["POST"])
-def read_file():
-    filename = request.form["filename"]
+def safe_file_access(user_input):
+    # GOOD: Sanitize and validate the file path
+    base_dir = "/home/user/files"
+    sanitized_input = os.path.basename(user_input)
+    file_path = os.path.join(base_dir, sanitized_input)
 
-    # Normalize the path to prevent path traversal
-    normalized_path = os.path.normpath(filename)
+    # Additional validation
+    if not os.path.abspath(file_path).startswith(base_dir):
+        raise SecurityException("Path traversal attempt detected")
 
-    # Construct the absolute path of the file
-    absolute_file_path = os.path.abspath(os.path.join(BASE_DIRECTORY, normalized_path))
-
-    # Check if the absolute file path is within the base directory
-    # if not absolute_file_path.startswith(BASE_DIRECTORY):
-    #    return "Path traversal attempt detected!", 400
-
-    # Check if the file exists
-    if not os.path.isfile(absolute_file_path):
-        return "File not found!", 404
-
-    # Read and return the file content
-    try:
-        with open(absolute_file_path, "r") as file:
-            content = file.read()
-        return f"<pre>{content}</pre>"
-    except Exception as e:
-        return f"Error reading file: {e}", 500
+    with open(file_path, "r") as file:
+        return file.read()
 
 
-eval("os.system('rm -rf /')")
-
-if __name__ == "__main__":
-    # Ensure the base directory exists
-    if not os.path.exists(BASE_DIRECTORY):
-        os.makedirs(BASE_DIRECTORY)
-
-    # Run the Flask web server
-    app.run(debug=True)
+# Example web route handler
+def handle_file_request(request):
+    filename = request.GET.get("filename", "")
+    return unsafe_file_access(filename)  # Vulnerable to path traversal
