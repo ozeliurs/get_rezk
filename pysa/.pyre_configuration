@@ -3,6 +3,9 @@
   "source_directories": [
     "."
   ],
+  "taint_models_path": [
+    "."
+  ],
   "search_path": [
     "stubs/"
   ]
