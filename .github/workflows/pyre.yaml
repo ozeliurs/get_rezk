@@ -25,6 +25,6 @@ jobs:
           pip install pyre-check django
 
       - name: Run Pyre analyze
-        working-directory: ${{ github.workspace }}/pysa
+        working-directory: ${{ github.workspace }}/pysa/src
         run: |
           pyre analyze
