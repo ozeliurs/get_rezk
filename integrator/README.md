@@ -10,7 +10,7 @@ XMLHttpRequest = function () {...}
 ## 2.
 Change `boot.js` (and if need be `trusted.js`) to avoid the attack.
 
-We can protect `XMLHttpRequest` in [boot.js](tp2/boot.js) by making `XMLHttpRequest` non-configurable and non-writable.
+> We can protect `XMLHttpRequest` in [boot.js](tp2/boot.js) by making `XMLHttpRequest` non-configurable and non-writable.
 
 ```javascript
 (function () {
@@ -32,12 +32,12 @@ For each of the following versions of the mashup, can the external gadget `adapi
 
 ### a.
 
-For the v1, the external gadget can read the value of `secret` and obtain a pointer to `window`. See [q3/v1/adapi.js](q3/v1/adapi.js).
+> For the v1, the external gadget can read the value of `secret` and obtain a pointer to `window`. See [q3/v1/adapi.js](q3/v1/adapi.js).
 
 ### b.
 
-For the v2, the external gadget cannot read the value of `secret` but can obtain a pointer to `window`. See [q3/v2/adapi.js](q3/v2/adapi.js).
+> For the v2, the external gadget cannot read the value of `secret` but can obtain a pointer to `window`. See [q3/v2/adapi.js](q3/v2/adapi.js).
 
 ### c.
 
-For the v3, the external gadget cannot read the value of `secret` and cannot obtain a pointer to `window`.
+> For the v3, the external gadget cannot read the value of `secret` and cannot obtain a pointer to `window`.
