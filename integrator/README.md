@@ -1,7 +1,7 @@
 ## 1.
 See code for `boot.js`, `trusted.js`, `mashup1.js`. Without changing this code, write code for `attacker.js` in order to make `trusted.js` execute unwanted code.
 
-> We can write [attacker.js](tp1/attacker.js) that will redefine `XMLHttpRequest` and make it execute unwanted code.
+> We can write [attacker.js](q1/attacker.js) that will redefine `XMLHttpRequest` and make it execute unwanted code.
 
 ```javascript
 XMLHttpRequest = function () {...}
@@ -10,7 +10,7 @@ XMLHttpRequest = function () {...}
 ## 2.
 Change `boot.js` (and if need be `trusted.js`) to avoid the attack.
 
-> We can protect `XMLHttpRequest` in [boot.js](tp2/boot.js) by making `XMLHttpRequest` non-configurable and non-writable.
+> We can protect `XMLHttpRequest` in [boot.js](q2/boot.js) by making `XMLHttpRequest` non-configurable and non-writable.
 
 ```javascript
 (function () {
