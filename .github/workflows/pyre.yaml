@@ -11,6 +11,7 @@ on:
     paths:
       - "pysa/**"
       - ".github/workflows/pyre.yaml"
+  workflow_dispatch:
 
 jobs:
   pyre:
@@ -23,7 +24,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
