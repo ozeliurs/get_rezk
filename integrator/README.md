@@ -3,7 +3,8 @@
 Look at the code of integrator.html and write code for evilGadget.js in such a way that evilGadget.js will send the secret to evil.com.
 Rewrite integrator.html so the same origin policy will protect the secret.
 
-> We can write [evilGadget.js](q1/evilGadget.js) that will send the secret to evil.com via an image tag.
+> You can start the webserver with `./start.sh`. It will start a server on port 80 and add `evil.local` and `host/local` to your `/etc/hosts` file.
+> We can write [evilGadget.js](q1/evil/evilGadget.js) that will send the secret to evil.com via an image tag.
 > We can add a more strict CSP header to the index.html to protect the secret.
 
 ```html
