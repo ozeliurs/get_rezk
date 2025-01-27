@@ -4,15 +4,10 @@ Look at the code of integrator.html and write code for evilGadget.js in such a w
 Rewrite integrator.html so the same origin policy will protect the secret.
 
 > We can write [evilGadget.js](q1/evilGadget.js) that will send the secret to evil.com via an image tag.
-> We can replace the `<script>` tag with an `<iframe>` tag to sandbox the evilGadget.
+> We can add a more strict CSP header to the index.html to protect the secret.
 
 ```html
-<iframe
-  src="http://evil.com/evilGadget.html"
-  sandbox="allow-scripts"
-  width="400"
-  height="200"
-></iframe>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' http://evil.local;">
 ```
 
 ## 2.

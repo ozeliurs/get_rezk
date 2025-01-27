@@ -1,0 +1,12 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' http://evil.local;">
+    </head>
+    <body>
+        <h1>
+            Trusted page
+            <div id="secret">42</div>
+        </h1>
+        <script src=http://evil.local/evilGadget.js></script>
+    </body>
+</html>
