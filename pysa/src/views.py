@@ -1,14 +1,19 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-#
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
+import os
 
 from django.http import HttpRequest, HttpResponse
 
 
-def operate_on_twos(request: HttpRequest) -> HttpResponse:
-    operator = request.GET["operator"]
+def pt(request: HttpRequest) -> HttpResponse:
+    filename = request.GET["filename"]
 
-    result = eval(f"2 {operator} 2")  # noqa: P204
+    file_path = os.path.join("/data", filename)
 
-    return result
+    try:
+        with open(file_path, "r") as file:
+            content = file.read()
+    except FileNotFoundError:
+        return HttpResponse("File not found", status=404)
+    except Exception as e:
+        return HttpResponse(f"An error occurred: {str(e)}", status=500)
+
+    return HttpResponse(content)
