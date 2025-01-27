@@ -14,4 +14,4 @@
 - [TD 2](td/td2.pdf)
 - [TD 3](td/td3.pdf)
 - [TD 4](td/td4.pdf)
-- [TD 5](td/td5.pdf)
+- [TD 5](pysa)  [![Pyre Analyze](https://github.com/ozeliurs/get_rezk/actions/workflows/pyre.yaml/badge.svg)](https://github.com/ozeliurs/get_rezk/actions/workflows/pyre.yaml)
