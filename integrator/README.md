@@ -1,43 +1,42 @@
 ## 1.
-See code for `boot.js`, `trusted.js`, `mashup1.js`. Without changing this code, write code for `attacker.js` in order to make `trusted.js` execute unwanted code.
 
-> We can write [attacker.js](q1/attacker.js) that will redefine `XMLHttpRequest` and make it execute unwanted code.
+Look at the code of integrator.html and write code for evilGadget.js in such a way that evilGadget.js will send the secret to evil.com.
+Rewrite integrator.html so the same origin policy will protect the secret.
 
-```javascript
-XMLHttpRequest = function () {...}
+> We can write [evilGadget.js](q1/evilGadget.js) that will send the secret to evil.com via an image tag.
+> We can replace the `<script>` tag with an `<iframe>` tag to sandbox the evilGadget.
+
+```html
+<iframe
+  src="http://evil.com/evilGadget.html"
+  sandbox="allow-scripts"
+  width="400"
+  height="200"
+></iframe>
 ```
 
 ## 2.
-Change `boot.js` (and if need be `trusted.js`) to avoid the attack.
 
-> We can protect `XMLHttpRequest` in [boot.js](q2/boot.js) by making `XMLHttpRequest` non-configurable and non-writable.
+Look at the sop2.html. From subdomain2.html try to read the secret from the integrator, what happens according to SOP?
+How do you read the secret by using document.domain?
 
-```javascript
-(function () {
-  var originalXHR = XMLHttpRequest;
-  Object.defineProperty(window, "XMLHttpRequest", {
-    value: originalXHR,
-    writable: false,
-    configurable: false,
-  });
-})();
-```
+> You can start the webserver with `./start.sh`. It will start a server on port 80 and add `evil.local` and `host/local` to your `/etc/hosts` file.
+>
 
 ## 3.
-Let `adapi.js` be the code for some external gadget.
-Assume that code for `adapi.js` has been verified and cannot access `window` directly, however it has access to function `integrator` whenever it is available.
-For each of the following versions of the mashup, can the external gadget `adapi.js`:
-- read the value of `secret`?
-- obtain a pointer to `window`?
 
-### a.
+Write two different services from the same server that set a cookie.
 
-> For the v1, the external gadget can read the value of `secret` and obtain a pointer to `window`. See [q3/v1/adapi.js](q3/v1/adapi.js).
+On the client side include a gadget and try the following things:
+- Let the gadget delete the cookie via JavaScript.
+- Can the second service delete the cookie of the first? Justify why.
+- Let the gadget send the cookie to another server (you can use a different port to simulate this).
+- Does the previous item work if the gadget is inside a frame?
+- And if the gadget is inside a script and the cookie is initially set as httpOnly?
+- And if the gadget is inside a script and the cookie is initially set as secure?
 
-### b.
+Justify all your answers with code and explanations.
 
-> For the v2, the external gadget cannot read the value of `secret` but can obtain a pointer to `window`. See [q3/v2/adapi.js](q3/v2/adapi.js).
+## 4.
 
-### c.
-
-> For the v3, the external gadget cannot read the value of `secret` and cannot obtain a pointer to `window`.
+Implement a CSRF attack and explain then demonstrate what kind of SameSite cookie can mitigate this attack.
