@@ -6,4 +6,4 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./host:/usr/share/nginx/html/host:ro
-      - ./evil:/usr/share/nginx/html/evil:ro
+      - ./sub.host:/usr/share/nginx/html/sub.host:ro

@@ -17,7 +17,7 @@ Look at the sop2.html. From subdomain2.html try to read the secret from the inte
 How do you read the secret by using document.domain?
 
 > You can start the webserver with `./start.sh`. It will start a server on port 80 and add `evil.local` and `host/local` to your `/etc/hosts` file.
->
+> The secret is not accesible because the SOP is enforced.
 
 ## 3.
 

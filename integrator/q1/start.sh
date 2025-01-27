@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-./hosts.sh add
+hosts="host.local evil.local"
+
+../scripts/hosts.sh add $hosts
 docker compose up -d
 
-trap 'docker compose down; ./hosts.sh del' SIGINT
+trap 'docker compose down; ../scripts/hosts.sh del $hosts' SIGINT
 
 # Display logs instead of sleeping
 docker compose logs -f
