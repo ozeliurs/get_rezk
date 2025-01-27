@@ -3,8 +3,14 @@ name: Pyre Analyze
 on:
   push:
     branches: [main]
+    paths:
+      - "pysa/**"
+      - ".github/workflows/pyre.yaml"
   pull_request:
     branches: [main]
+    paths:
+      - "pysa/**"
+      - ".github/workflows/pyre.yaml"
 
 jobs:
   pyre:
