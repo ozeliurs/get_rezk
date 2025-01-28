@@ -1,0 +1,30 @@
+services:
+  server1:
+    build:
+      context: ./svc1
+    networks:
+      - cookie-net
+    stop_grace_period: 0s
+
+  server3:
+    build:
+      context: ./svc3
+    networks:
+      - cookie-net
+    stop_grace_period: 0s
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - cookie-net
+    depends_on:
+      - server1
+      - server3
+
+networks:
+  cookie-net:
+    driver: bridge
