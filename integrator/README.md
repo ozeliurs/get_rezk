@@ -6,6 +6,7 @@ Rewrite integrator.html so the same origin policy will protect the secret.
 > You can start the webserver with `./start.sh`. It will start a server on port 80 and add `evil.local` and `host/local` to your `/etc/hosts` file.
 > We can write [evilGadget.js](q1/evil/evilGadget.js) that will send the secret to evil.com via an image tag.
 > We can add a more strict CSP header to the index.html to protect the secret.
+>
 
 ```html
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' http://evil.local;">
